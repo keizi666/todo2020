@@ -31,20 +31,8 @@ class todo_RS : RecordSet {
 		self.priority = result.long(forColumnIndex:3)
 		self.create_date = DBManager.stringToDate(format: "yyyy-MM-dd HH:mm:ss", strDate: result.string(forColumnIndex:4)!)
 		
-		//DBManager.stringToDate(format: "yyyy-MM-dd HH:mm:ss", strDate: result.string(forColumnIndex:4)!)
-		
 	}
 	
-	
-	//レコードを変換する
-	/*func toRecordSet(result:FMResultSet) {
-		self.id = result.long(forColumnIndex: 0)
-		self.title = DBManager.normalizeString(result.string(forColumnIndex: 1))
-		self.description = result.string(forColumnIndex: 2)
-		self.priority = result.long(forColumnIndex: 3)
-		self.create_date = DBManager.stringToDate(format: "yyyy-MM-dd HH:mm:ss", strDate: result.string(forColumnIndex: 4)!)
-	}*/
-
 
 }
 

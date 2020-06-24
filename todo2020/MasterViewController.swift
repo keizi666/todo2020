@@ -13,6 +13,7 @@ class MasterViewController: UITableViewController {
 	var detailViewController: DetailViewController? = nil
 	var objects = [Any]()
 
+	let dbm:DBManager = DBManager(dbFileName:"todo.db")
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -25,6 +26,15 @@ class MasterViewController: UITableViewController {
 		    let controllers = split.viewControllers
 		    detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
 		}
+		
+		if(dbm.isOK) {
+			let results = dbm.execQuery(sql:"select * from todo order by id desc;")
+			while results.next() {
+				let rs = todo_RS()
+				rs.toRecordSet(result:results)
+				objects.append(rs)
+			}
+		}
 	}
 
 	override func viewWillAppear(_ animated: Bool) {
@@ -34,9 +44,24 @@ class MasterViewController: UITableViewController {
 
 	@objc
 	func insertNewObject(_ sender: Any) {
-        objects.insert(todo_RS("New TODO","new description",0), at: 0)
+        let newTodo = todo_RS("New TODO","new description",0)
+        objects.insert(newTodo, at: 0)
         let indexPath = IndexPath(row: 0, section: 0)
         tableView.insertRows(at: [indexPath], with: .automatic)
+        
+        //DBに追加する
+        if(dbm.execUpdateSQL(sql:String(format:"insert into todo(title,description,priority) values('%@','%@',%d);",DBManager.normalizeSQL(newTodo.title),DBManager.normalizeSQL(newTodo.description),newTodo.priority))) {
+            UIUtility.showAlertWithOK(vc: self, title: "確認", message: "TODOを追加しました",handler:nil)
+            
+            //今追加したレコードを読み込む（idを取得したいためにDBから読み直す）
+            let results = dbm.execQuery(sql: "select * from todo order by id desc limit 1;")
+            results.next()
+            let rs = todo_RS()
+            rs.toRecordSet(result: results)
+            objects[0] = rs
+            
+        }
+		
 	}
 
     func reloadTable() {
@@ -82,9 +107,17 @@ class MasterViewController: UITableViewController {
 	}
 
 	override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
+		if editingStyle == .delete {
+            let todoRS:todo_RS = objects[indexPath.row] as! todo_RS
+            
             objects.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
+            
+            //DBから削除する処理
+            if(dbm.execUpdateSQL(sql: String(format: "delete from todo where id = %d;", todoRS.id))) {
+                UIUtility.showAlertWithOK(vc: self, title: "確認", message: "削除しました", handler:nil)
+            }
+            
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
         }
