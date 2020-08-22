@@ -20,6 +20,7 @@
 		A66EB32324A3204A00FA362A /* DBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A66EB32024A3204A00FA362A /* DBManager.swift */; };
 		A66EB32424A3204A00FA362A /* RecordSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A66EB32124A3204A00FA362A /* RecordSet.swift */; };
 		A66EB34424A3261A00FA362A /* todo.db in Resources */ = {isa = PBXBuildFile; fileRef = A66EB34324A3261A00FA362A /* todo.db */; };
+		A6AE708C24F0F31C00A5EA94 /* TodoModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6AE708B24F0F31C00A5EA94 /* TodoModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		A66EB32124A3204A00FA362A /* RecordSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordSet.swift; sourceTree = "<group>"; };
 		A66EB34324A3261A00FA362A /* todo.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = todo.db; sourceTree = "<group>"; };
 		A6705AF58ED5B81453E8E5F4 /* Pods-todo2020.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-todo2020.release.xcconfig"; path = "Target Support Files/Pods-todo2020/Pods-todo2020.release.xcconfig"; sourceTree = "<group>"; };
+		A6AE708B24F0F31C00A5EA94 /* TodoModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoModel.swift; sourceTree = "<group>"; };
 		D4C92F412DEF75EA4F740014 /* Pods_todo2020.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_todo2020.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2E125EFA1893C786525D5DD /* Pods-todo2020.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-todo2020.debug.xcconfig"; path = "Target Support Files/Pods-todo2020/Pods-todo2020.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -75,21 +77,38 @@
 		A66EB30624A31E5600FA362A /* todo2020 */ = {
 			isa = PBXGroup;
 			children = (
+				A6AE708924F0F17100A5EA94 /* SQLite3 */,
+				A6AE708A24F0F1AB00A5EA94 /* Realm */,
 				A66EB30724A31E5600FA362A /* AppDelegate.swift */,
 				A66EB30924A31E5600FA362A /* SceneDelegate.swift */,
 				A66EB30B24A31E5600FA362A /* MasterViewController.swift */,
-				A66EB31D24A31EF800FA362A /* todo_RS.swift */,
 				A66EB30D24A31E5600FA362A /* DetailViewController.swift */,
-				A66EB32024A3204A00FA362A /* DBManager.swift */,
-				A66EB32124A3204A00FA362A /* RecordSet.swift */,
 				A66EB31F24A3204A00FA362A /* UIUtility.swift */,
-				A66EB34324A3261A00FA362A /* todo.db */,
 				A66EB30F24A31E5600FA362A /* Main.storyboard */,
 				A66EB31224A31E5D00FA362A /* Assets.xcassets */,
 				A66EB31424A31E5D00FA362A /* LaunchScreen.storyboard */,
 				A66EB31724A31E5D00FA362A /* Info.plist */,
 			);
 			path = todo2020;
+			sourceTree = "<group>";
+		};
+		A6AE708924F0F17100A5EA94 /* SQLite3 */ = {
+			isa = PBXGroup;
+			children = (
+				A66EB34324A3261A00FA362A /* todo.db */,
+				A66EB31D24A31EF800FA362A /* todo_RS.swift */,
+				A66EB32024A3204A00FA362A /* DBManager.swift */,
+				A66EB32124A3204A00FA362A /* RecordSet.swift */,
+			);
+			path = SQLite3;
+			sourceTree = "<group>";
+		};
+		A6AE708A24F0F1AB00A5EA94 /* Realm */ = {
+			isa = PBXGroup;
+			children = (
+				A6AE708B24F0F31C00A5EA94 /* TodoModel.swift */,
+			);
+			path = Realm;
 			sourceTree = "<group>";
 		};
 		B4A79265122BB7F80CE6D959 /* Pods */ = {
@@ -225,6 +244,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A6AE708C24F0F31C00A5EA94 /* TodoModel.swift in Sources */,
 				A66EB32224A3204A00FA362A /* UIUtility.swift in Sources */,
 				A66EB30824A31E5600FA362A /* AppDelegate.swift in Sources */,
 				A66EB30A24A31E5600FA362A /* SceneDelegate.swift in Sources */,

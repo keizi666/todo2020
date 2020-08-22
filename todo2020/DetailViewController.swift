@@ -36,8 +36,8 @@ class DetailViewController: UIViewController {
 
     
     override func viewDidDisappear(_ animated: Bool) {
-        //DBに保存する
-        if let detailItemU = detailItem , let masterVCU = masterVC {
+        //DBに保存する DBManagerを使う場合はコメントアウトを取る
+/*        if let detailItemU = detailItem , let masterVCU = masterVC {
             detailItemU.title = tfTitle.text
             detailItemU.description = tfDescription.text
             masterVCU.reloadTable()
@@ -45,7 +45,9 @@ class DetailViewController: UIViewController {
             if(masterVCU.dbm.execUpdateSQL(sql: String(format: "update todo set title = '%@',description= '%@',priority = %d where id = %d;", DBManager.normalizeSQL(detailItemU.title),DBManager.normalizeSQL(detailItemU.description),detailItemU.priority,detailItemU.id))) {
                 UIUtility.showAlertWithOK(vc: masterVCU, title: "確認", message: "保存しました",handler: nil)
             }
-        }
+        }*/
+
+
         super.viewDidDisappear(animated)
     }
 	
