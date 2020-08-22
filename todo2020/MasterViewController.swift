@@ -7,14 +7,16 @@
 //
 
 import UIKit
+import RealmSwift
 
 class MasterViewController: UITableViewController {
 
-	var detailViewController: DetailViewController? = nil
-	var objects = [Any]()
+	var _detailViewController: DetailViewController? = nil
 
-	let dbm:DBManager = DBManager(dbFileName:"todo.db")
-
+	//TodoModel
+	private var _todoModels:Results<TodoModel>!
+	private var _token:NotificationToken!
+	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		// Do any additional setup after loading the view.
@@ -24,17 +26,18 @@ class MasterViewController: UITableViewController {
 		navigationItem.rightBarButtonItem = addButton
 		if let split = splitViewController {
 		    let controllers = split.viewControllers
-		    detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
+		    _detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
 		}
 		
-		if(dbm.isOK) {
-			let results = dbm.execQuery(sql:"select * from todo order by id desc;")
-			while results.next() {
-				let rs = todo_RS()
-				rs.toRecordSet(result:results)
-				objects.append(rs)
-			}
+		let _realm = try! Realm()
+		_todoModels = _realm.objects(TodoModel.self) //読み込みみたいなもん
+		_token = _todoModels.observe {[weak self] _ in　//データ更新通知を設定
+			self?.reloadTable()//めんどくさいのでテーブルビューをリロードしちゃう
 		}
+	}
+	
+	deinit {
+		_token.invalidate()
 	}
 
 	override func viewWillAppear(_ animated: Bool) {
@@ -42,38 +45,31 @@ class MasterViewController: UITableViewController {
 		super.viewWillAppear(animated)
 	}
 
+	//右上の＋ボタンで項目追加
 	@objc
 	func insertNewObject(_ sender: Any) {
-        let newTodo = todo_RS("New TODO","new description",0)
-        objects.insert(newTodo, at: 0)
-        let indexPath = IndexPath(row: 0, section: 0)
-        tableView.insertRows(at: [indexPath], with: .automatic)
-        
-        //DBに追加する
-        if(dbm.execUpdateSQL(sql:String(format:"insert into todo(title,description,priority) values('%@','%@',%d);",DBManager.normalizeSQL(newTodo.title),DBManager.normalizeSQL(newTodo.description),newTodo.priority))) {
-            UIUtility.showAlertWithOK(vc: self, title: "確認", message: "TODOを追加しました",handler:nil)
-            
-            //今追加したレコードを読み込む（idを取得したいためにDBから読み直す）
-            let results = dbm.execQuery(sql: "select * from todo order by id desc limit 1;")
-            results.next()
-            let rs = todo_RS()
-            rs.toRecordSet(result: results)
-            objects[0] = rs
-            
-        }
+		let newTodo = TodoModel()
+		newTodo.title = "New TODO"
+		newTodo.contents = "new description"
+		newTodo.create_date = Date()
 		
+		let realm = try! Realm()
+		try! realm.write {
+			realm.add(newTodo)
+		}
 	}
 
+	//リロード
     func reloadTable() {
         self.tableView.reloadData()
     }
 	
 	// MARK: - Segues
-
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showDetail" {
             if let indexPath = tableView.indexPathForSelectedRow {
-                let object = objects[indexPath.row] as! todo_RS
+				
+                let object = _todoModels[indexPath.row]
                 let controller = (segue.destination as! UINavigationController).topViewController as! DetailViewController
                 controller.detailItem = object
                 controller.masterVC = self
@@ -81,7 +77,6 @@ class MasterViewController: UITableViewController {
                 controller.navigationItem.leftItemsSupplementBackButton = true
             }
         }
-		
 	}
 
 	// MARK: - Table View
@@ -91,14 +86,15 @@ class MasterViewController: UITableViewController {
 	}
 
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return objects.count
+		return _todoModels.count
 	}
 
+	//表示
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        let object = objects[indexPath.row] as! todo_RS
-        cell.textLabel!.text = object.title
-        return cell
+		let todo = _todoModels[indexPath.row]
+        cell.textLabel!.text = todo.title
+		return cell
 	}
 
 	override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -106,18 +102,15 @@ class MasterViewController: UITableViewController {
 		return true
 	}
 
+	//テーブル更新
 	override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
 		if editingStyle == .delete {
-            let todoRS:todo_RS = objects[indexPath.row] as! todo_RS
-            
-            objects.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-            
-            //DBから削除する処理
-            if(dbm.execUpdateSQL(sql: String(format: "delete from todo where id = %d;", todoRS.id))) {
-                UIUtility.showAlertWithOK(vc: self, title: "確認", message: "削除しました", handler:nil)
-            }
-            
+			//削除
+			let realm = try! Realm()
+			try! realm.write {
+				realm.delete(_todoModels[indexPath.row])
+			}
+			
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
         }

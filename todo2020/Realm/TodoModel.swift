@@ -11,9 +11,9 @@ import RealmSwift
 
 class TodoModel:Object {
 	@objc dynamic var title = ""
-	@objc dynamic var description = ""
-	var priority:Int = 0
-	var create_date:Date! = nil
+	@objc dynamic var contents = ""
+	@objc dynamic var priority:Int = 0
+	@objc dynamic var create_date:Date! = nil
 	
 	
 }
